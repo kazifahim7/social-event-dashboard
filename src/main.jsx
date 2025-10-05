@@ -16,6 +16,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import UserManagement from './pages/UserManageMent.jsx';
 import EventManagement from './pages/EventManagement.jsx';
 import PaymentHistory from './pages/Payment.jsx';
+import AdMinPrivate from './private/AdminPrivate.jsx';
 
 
 const router = createBrowserRouter([
@@ -25,19 +26,19 @@ const router = createBrowserRouter([
     children:[
       {
         index: true,
-        element: <Dashboard></Dashboard>, 
+        element: <AdMinPrivate><Dashboard></Dashboard></AdMinPrivate>, 
       },
       {
         path: "manageUser",
-        element: <UserManagement></UserManagement>, 
+        element: <AdMinPrivate><UserManagement></UserManagement></AdMinPrivate>, 
       },
       {
         path: "eventManagement",
-        element: <EventManagement></EventManagement> 
+        element: <AdMinPrivate><EventManagement></EventManagement> </AdMinPrivate>
       },
       {
         path: "payment",
-        element: <PaymentHistory></PaymentHistory>
+        element: <AdMinPrivate><PaymentHistory></PaymentHistory>w</AdMinPrivate>
       }
      
     ]

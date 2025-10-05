@@ -78,7 +78,7 @@ const initialPayments = [
           amount: 1500,
           currency: "BDT",
           paymentMethod: "Credit Card",
-          status: "Refunded",
+          status: "Completed",
           date: "15 feb 2026, 10:30 AM",
 
      },
@@ -222,8 +222,7 @@ const PaymentHistory = () => {
           All: payments.length,
           Completed: payments.filter(p => p.status === 'Completed').length,
           Pending: payments.filter(p => p.status === 'Pending').length,
-          Failed: payments.filter(p => p.status === 'Failed').length,
-          Refunded: payments.filter(p => p.status === 'Refunded').length
+          Failed: payments.filter(p => p.status === 'Failed').length
      };
 
      // Generate page numbers with ellipsis
