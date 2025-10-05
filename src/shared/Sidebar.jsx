@@ -17,6 +17,7 @@ import { AuthContext } from '../AuthProvider/AuthProvider'
 // import 'sweetalert2/src/sweetalert2.scss'
 import { FaUser } from 'react-icons/fa'
 import { RiDashboardLine } from 'react-icons/ri'
+import { MdOutlinePayments } from 'react-icons/md'
 
 
 
@@ -108,7 +109,7 @@ const Sidebar = () => {
 
 
                                    <NavLink
-                                        to='/dashboard/ManageContests'
+                                        to='/eventManagement'
                                         className={({ isActive }) =>
                                              `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${isActive ? 'bg-gray-300  text-gray-700' : 'text-black'
                                              }`
@@ -116,7 +117,19 @@ const Sidebar = () => {
                                    >
                                         <BsFillHouseAddFill className='w-5 h-5' />
 
-                                        <span className='mx-4 font-medium'>Manage Contests</span>
+                                        <span className='mx-4 font-medium'>Event ManageMent</span>
+                                   </NavLink>
+                                   <NavLink
+                                        to='/payment'
+                                        className={({ isActive }) =>
+                                             `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${isActive ? 'bg-gray-300  text-gray-700' : 'text-black'
+                                             }`
+                                        }
+                                   >
+                                       
+                                        <MdOutlinePayments className='w-5 h-5' />
+
+                                        <span className='mx-4 font-medium'>Payment History</span>
                                    </NavLink>
 
 

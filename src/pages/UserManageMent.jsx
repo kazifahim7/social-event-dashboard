@@ -129,7 +129,7 @@ export default function UserManagement() {
                          <button
                               disabled={currentPage === 1}
                               onClick={() => setCurrentPage((p) => p - 1)}
-                              className={`px-4 py-2 rounded-md border ${currentPage === 1
+                              className={`px-4 py-1 rounded-md border ${currentPage === 1
                                         ? "bg-gray-200 cursor-not-allowed"
                                         : "bg-[#DACBA4] hover:bg-[#c7b684]"
                                    }`}
@@ -153,7 +153,7 @@ export default function UserManagement() {
                          <button
                               disabled={currentPage === totalPages}
                               onClick={() => setCurrentPage((p) => p + 1)}
-                              className={`px-4 py-2 rounded-md border ${currentPage === totalPages
+                              className={`px-4 py-1 rounded-md border ${currentPage === totalPages
                                         ? "bg-gray-200 cursor-not-allowed"
                                         : "bg-[#DACBA4] hover:bg-[#c7b684]"
                                    }`}

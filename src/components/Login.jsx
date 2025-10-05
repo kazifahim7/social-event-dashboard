@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const LoginForm = () => {
      const [showPassword, setShowPassword] = useState(false);
+     const navigate =useNavigate()
      const {
           register,
           handleSubmit,
@@ -13,6 +15,12 @@ const LoginForm = () => {
      const onSubmit = (data) => {
           console.log(data);
           // Handle login logic here
+          Swal.fire({
+               title: "Good job!",
+               text: "login successfully",
+               icon: "success"
+          });
+          navigate('/')
      };
 
      const togglePasswordVisibility = () => {

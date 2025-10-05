@@ -14,6 +14,8 @@ import SetNewPassword from './components/ResetPassword.jsx';
 import AuthProvider from './AuthProvider/AuthProvider.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import UserManagement from './pages/UserManageMent.jsx';
+import EventManagement from './pages/EventManagement.jsx';
+import PaymentHistory from './pages/Payment.jsx';
 
 
 const router = createBrowserRouter([
@@ -29,6 +31,14 @@ const router = createBrowserRouter([
         path: "manageUser",
         element: <UserManagement></UserManagement>, 
       },
+      {
+        path: "eventManagement",
+        element: <EventManagement></EventManagement> 
+      },
+      {
+        path: "payment",
+        element: <PaymentHistory></PaymentHistory>
+      }
      
     ]
   },
