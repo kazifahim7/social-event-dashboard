@@ -17,6 +17,7 @@ import UserManagement from './pages/UserManageMent.jsx';
 import EventManagement from './pages/EventManagement.jsx';
 import PaymentHistory from './pages/Payment.jsx';
 import AdMinPrivate from './private/AdminPrivate.jsx';
+import { Toaster } from 'react-hot-toast';
 
 
 const router = createBrowserRouter([
@@ -62,6 +63,10 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
       <RouterProvider router={router} />
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+      />
     </AuthProvider>
   
   </StrictMode>,

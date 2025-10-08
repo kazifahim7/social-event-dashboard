@@ -1,9 +1,15 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import Swal from 'sweetalert2';
+import { reset_password } from '../service/Auth';
+import { useNavigate } from 'react-router-dom';
 
-const SetNewPassword = () => {
+
+const SetNewPassword = ({email,otp}) => {
      const [showPassword, setShowPassword] = useState(false);
      const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+     const navigate = useNavigate()
 
      const {
           register,
@@ -15,10 +21,31 @@ const SetNewPassword = () => {
      const password = watch("password");
 
      const onSubmit = async (data) => {
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          console.log('Password reset:', data);
-          // Handle password reset logic here
+         
+         
+
+         
+               const result = await reset_password({ otp, email, newPassword: data.confirmPassword })
+               console.log(result, "result")
+               if (result.success) {
+                    
+                    Swal.fire({
+                         title: "success",
+                         text: "password change successfully",
+                         icon: "success"
+                    });
+                    navigate("/login")
+                    
+
+               } else {
+                    Swal.fire({
+                         icon: "error",
+                         title: "Oops...",
+                         text: `${result.message}`
+                    });
+               }
+
+         
      };
 
      const togglePasswordVisibility = () => {

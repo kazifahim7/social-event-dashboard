@@ -18,6 +18,7 @@ import { AuthContext } from '../AuthProvider/AuthProvider'
 import { FaUser } from 'react-icons/fa'
 import { RiDashboardLine } from 'react-icons/ri'
 import { MdOutlinePayments } from 'react-icons/md'
+import Swal from 'sweetalert2'
 
 
 
@@ -35,6 +36,12 @@ const Sidebar = () => {
           setActive(!isActive)
      }
      const logout = () => {
+          localStorage.removeItem("token")
+          Swal.fire({
+               title: "Log out successful",
+               text: "You clicked the button!",
+               icon: "success"
+          });
           navigate("/login")
      }
      return (

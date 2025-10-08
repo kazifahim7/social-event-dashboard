@@ -1,7 +1,9 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { login } from '../service/Auth';
 
 const LoginForm = () => {
      const [showPassword, setShowPassword] = useState(false);
@@ -12,15 +14,37 @@ const LoginForm = () => {
           formState: { errors },
      } = useForm();
 
-     const onSubmit = (data) => {
-          console.log(data);
-          // Handle login logic here
-          Swal.fire({
-               title: "Good job!",
-               text: "login successfully",
-               icon: "success"
-          });
-          navigate('/')
+     const onSubmit = async(data) => {
+
+          try {
+               const result = await login(data)
+               console.log(result,"result")
+               if(result.success){
+                    localStorage.setItem("token", result.data.token)
+                    Swal.fire({
+                         title: "Good job!",
+                         text: "login successfully",
+                         icon: "success"
+                    });
+                    navigate('/')
+
+               }else{
+                    Swal.fire({
+                         icon: "error",
+                         title: "Oops...",
+                         text: "Something went wrong!"
+                    });
+               }
+               
+          } catch (error) {
+               Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!"
+               });
+          }
+        
+        
      };
 
      const togglePasswordVisibility = () => {

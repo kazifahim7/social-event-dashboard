@@ -1,10 +1,15 @@
+/* eslint-disable no-unused-vars */
 import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
+import SetNewPassword from './ResetPassword';
+import { forgot_password } from '../service/Auth';
+import Swal from 'sweetalert2';
+
 
 const ForgotPassword = () => {
-     const [step, setStep] = useState('email'); // 'email' or 'otp'
+     const [step, setStep] = useState('email'); 
      const [email, setEmail] = useState('');
-     const [otp, setOtp] = useState(['', '', '', '']);
+     const [otp, setOtp] = useState(['', '', '', '','','']);
      const inputRefs = useRef([]);
 
      const {
@@ -14,11 +19,39 @@ const ForgotPassword = () => {
      } = useForm();
 
      const onSubmit = async (data) => {
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          console.log('OTP sent to:', data.email);
-          setEmail(data.email);
-          setStep('otp');
+        
+            try {
+                 const result = await forgot_password({ email: data.email })
+                         console.log(result,"result")
+                         if(result.success){
+                              Swal.fire({
+                                   title: "otp sending",
+                                   text: "Please Check your mail",
+                                   icon: "success"
+                              });
+                              setEmail(data.email);
+                              setStep('otp');
+          
+                         }else{
+                              Swal.fire({
+                                   icon: "error",
+                                   title: "Oops...",
+                                   text: "Something went wrong!"
+                              });
+                         }
+                         
+                    } catch (error) {
+                         Swal.fire({
+                              icon: "error",
+                              title: "Oops...",
+                              text: "Something went wrong!"
+                         });
+                    }
+
+
+
+
+         
      };
 
      const handleOtpChange = (index, value) => {
@@ -29,7 +62,7 @@ const ForgotPassword = () => {
           setOtp(newOtp);
 
           // Auto-focus next input
-          if (value && index < 3) {
+          if (value && index < 5) {
                inputRefs.current[index + 1].focus();
           }
      };
@@ -43,7 +76,7 @@ const ForgotPassword = () => {
 
      const handlePaste = (e) => {
           e.preventDefault();
-          const pasteData = e.clipboardData.getData('text').slice(0, 4);
+          const pasteData = e.clipboardData.getData('text').slice(0, 6);
           const pasteArray = pasteData.split('');
 
           const newOtp = [...otp];
@@ -60,20 +93,56 @@ const ForgotPassword = () => {
           inputRefs.current[lastFilledIndex].focus();
      };
 
-     const handleOtpSubmit = (e) => {
+     const handleOtpSubmit = async (e) => {
           e.preventDefault();
           const otpValue = otp.join('');
-          if (otpValue.length === 4) {
+
+          if (otpValue.length === 6) {
                console.log('OTP verified:', otpValue);
-               // Handle OTP verification logic here
+
+               // Simulate OTP verification API call
+               await new Promise(resolve => setTimeout(resolve, 1000));
+
+               // If OTP verification is successful, move to new password step
+               setStep('newPassword');
           }
      };
 
-     const handleResendOtp = () => {
-          if (email) {
-               onSubmit({ email });
+     const handleResendOtp = async() => {
+          try {
+               const result = await forgot_password({ email: email })
+               console.log(result, "result")
+               if (result.success) {
+                    Swal.fire({
+                         title: "otp sending",
+                         text: "Please Check your mail",
+                         icon: "success"
+                    });
+                    setEmail(email);
+                    setStep('otp');
+
+               } else {
+                    Swal.fire({
+                         icon: "error",
+                         title: "Oops...",
+                         text: "Something went wrong!"
+                    });
+               }
+
+          } catch (error) {
+               Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!"
+               });
           }
      };
+
+     // If step is newPassword, show SetNewPassword component
+     const otpValue = otp.join('');
+     if (step === 'newPassword') {
+          return <SetNewPassword email={email} otp={otpValue} />;
+     }
 
      if (step === 'otp') {
           return (
@@ -103,7 +172,7 @@ const ForgotPassword = () => {
                                              Enter verification code
                                         </label>
                                         <div className="flex justify-between space-x-3">
-                                             {[0, 1, 2, 3].map((index) => (
+                                             {[0, 1, 2, 3,4,5].map((index) => (
                                                   <input
                                                        key={index}
                                                        ref={(el) => (inputRefs.current[index] = el)}
