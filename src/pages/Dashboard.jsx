@@ -193,8 +193,8 @@ export default function Dashboard() {
           <div className="p-6 bg-gray-50 min-h-screen">
                {/* Dashboard Loading */}
                {loading.dashboard && (
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                         <div className="bg-white p-6 rounded-lg shadow-lg">
+                    <div className="fixed inset-0  flex items-center justify-center z-50">
+                         <div className=" p-6 rounded-lg shadow-lg">
                               <div className="flex items-center gap-3">
                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                    <span>Loading dashboard...</span>
@@ -214,7 +214,7 @@ export default function Dashboard() {
                     </div>
                     <div className="bg-white p-8 rounded shadow text-center">
                          <p className="text-sm text-gray-400">subscriptions user</p>
-                         <p className="text-2xl font-bold">{0}</p>
+                         <p className="text-2xl font-bold">{data?.users?.subscribedUser || 0}</p>
                     </div>
                </div>
 
@@ -225,6 +225,8 @@ export default function Dashboard() {
                               <tr className="bg-[#DACBA4]">
                                    <th className="py-2 px-4 text-left">Name</th>
                                    <th className="py-2 px-4 text-left">Email</th>
+                                   <th className="py-2 px-4 text-left">events Joined</th>
+                                   <th className="py-2 px-4 text-left">events Created</th>
                                    <th className="py-2 px-4 text-left">Status</th>
                                    <th className="py-2 px-4 text-left">Approval</th>
                                    <th className="py-2 px-4 text-left">Action</th>
@@ -248,6 +250,8 @@ export default function Dashboard() {
                                              {user.name}
                                         </td>
                                         <td className="py-2 px-4">{user.email}</td>
+                                        <td className="py-2 px-4">{user.subscription.eventsCreated}</td>
+                                        <td className="py-2 px-4">{user.subscription.eventsJoined}</td>
                                         <td className="py-2 px-4">
                                              <span
                                                   className={`px-2 rounded-full text-white ${user.isBlocked ? "bg-red-500" : "bg-green-500"

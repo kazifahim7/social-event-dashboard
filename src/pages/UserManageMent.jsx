@@ -251,6 +251,8 @@ export default function UserManagement() {
                               <tr className="bg-[#DACBA4]">
                                    <th className="py-2 px-4 text-left">Name</th>
                                    <th className="py-2 px-4 text-left">Email</th>
+                                   <th className="py-2 px-4 text-left">events Created</th>
+                                   <th className="py-2 px-4 text-left">events Joined</th>
                                    <th className="py-2 px-4 text-left">Status</th>
                                    <th className="py-2 px-4 text-left">Approval</th>
                                    <th className="py-2 px-4 text-left">Action</th>
@@ -275,6 +277,8 @@ export default function UserManagement() {
                                                   {user.name}
                                              </td>
                                              <td className="py-2 px-4">{user.email}</td>
+                                             <td className="py-2 px-4">{user?.subscription?.eventsCreated}</td>
+                                             <td className="py-2 px-4">{user?.subscription?.eventsJoined}</td>
                                              <td className="py-2 px-4">
                                                   <span
                                                        className={`px-2 py-1 rounded-full text-white text-xs ${user.isBlocked ? "bg-red-500" : "bg-green-500"
