@@ -15,7 +15,6 @@ const initialPayments = [
           paymentMethod: "Credit Card",
           status: "Completed",
           date: "15 sept 2025, 2:30 PM",
-        
      },
      {
           id: 2,
@@ -28,7 +27,6 @@ const initialPayments = [
           paymentMethod: "bKash",
           status: "Completed",
           date: "10 oct 2025, 11:15 AM",
-
      },
      {
           id: 3,
@@ -41,7 +39,6 @@ const initialPayments = [
           paymentMethod: "Bank Transfer",
           status: "Pending",
           date: "05 nov 2025, 4:45 PM",
-        
      },
      {
           id: 4,
@@ -54,7 +51,6 @@ const initialPayments = [
           paymentMethod: "Credit Card",
           status: "Failed",
           date: "20 dec 2025, 9:20 AM",
-       
      },
      {
           id: 5,
@@ -67,7 +63,6 @@ const initialPayments = [
           paymentMethod: "bKash",
           status: "Completed",
           date: "02 jan 2026, 3:10 PM",
-
      },
      {
           id: 6,
@@ -80,7 +75,6 @@ const initialPayments = [
           paymentMethod: "Credit Card",
           status: "Completed",
           date: "15 feb 2026, 10:30 AM",
-
      },
      {
           id: 7,
@@ -93,7 +87,6 @@ const initialPayments = [
           paymentMethod: "Bank Transfer",
           status: "Completed",
           date: "18 mar 2026, 1:45 PM",
-
      },
      {
           id: 8,
@@ -105,7 +98,7 @@ const initialPayments = [
           currency: "BDT",
           paymentMethod: "Credit Card",
           status: "Pending",
-
+          date: "12 apr 2026, 3:20 PM",
      },
      {
           id: 9,
@@ -118,7 +111,6 @@ const initialPayments = [
           paymentMethod: "bKash",
           status: "Completed",
           date: "18 sept 2025, 6:15 PM",
-    
      },
      {
           id: 10,
@@ -131,7 +123,72 @@ const initialPayments = [
           paymentMethod: "Credit Card",
           status: "Failed",
           date: "22 dec 2025, 11:30 AM",
-
+     },
+     // Subscription Purchase Entries
+     {
+          id: 11,
+          transactionId: "SUB001",
+          eventTitle: "Premium Subscription - Monthly",
+          userName: "Sarah Johnson",
+          email: "sarah@email.com",
+          amount: 999,
+          currency: "BDT",
+          paymentMethod: "Credit Card",
+          status: "Completed",
+          date: "01 jan 2026, 10:00 AM",
+          isSubscription: true
+     },
+     {
+          id: 12,
+          transactionId: "SUB002",
+          eventTitle: "Pro Subscription - Yearly",
+          userName: "Mike Chen",
+          email: "mike@email.com",
+          amount: 8999,
+          currency: "BDT",
+          paymentMethod: "bKash",
+          status: "Completed",
+          date: "05 jan 2026, 2:15 PM",
+          isSubscription: true
+     },
+     {
+          id: 13,
+          transactionId: "SUB003",
+          eventTitle: "Basic Subscription - Monthly",
+          userName: "Emma Davis",
+          email: "emma@email.com",
+          amount: 499,
+          currency: "BDT",
+          paymentMethod: "Bank Transfer",
+          status: "Pending",
+          date: "08 jan 2026, 11:30 AM",
+          isSubscription: true
+     },
+     {
+          id: 14,
+          transactionId: "SUB004",
+          eventTitle: "Premium Subscription - Yearly",
+          userName: "Alex Rodriguez",
+          email: "alex@email.com",
+          amount: 10999,
+          currency: "BDT",
+          paymentMethod: "Credit Card",
+          status: "Failed",
+          date: "10 jan 2026, 4:45 PM",
+          isSubscription: true
+     },
+     {
+          id: 15,
+          transactionId: "SUB005",
+          eventTitle: "Pro Subscription - Monthly",
+          userName: "Lisa Wang",
+          email: "lisa@email.com",
+          amount: 1499,
+          currency: "BDT",
+          paymentMethod: "bKash",
+          status: "Completed",
+          date: "15 jan 2026, 9:20 AM",
+          isSubscription: true
      }
 ];
 
@@ -142,6 +199,7 @@ const PaymentHistory = () => {
      const [filterStatus, setFilterStatus] = useState('All');
      const [sortBy, setSortBy] = useState('date');
      const [sortOrder, setSortOrder] = useState('desc');
+     const [filterType, setFilterType] = useState('All'); // New filter for payment type
 
      // Color scheme
      const primaryColor = '#DACBA4';
@@ -159,10 +217,14 @@ const PaymentHistory = () => {
           Refunded: '#6B7280'
      };
 
-     // Filter and sort payments
-     const filteredPayments = payments.filter(payment =>
-          filterStatus === 'All' || payment.status === filterStatus
-     );
+     // Filter payments by status and type
+     const filteredPayments = payments.filter(payment => {
+          const statusMatch = filterStatus === 'All' || payment.status === filterStatus;
+          const typeMatch = filterType === 'All' ||
+               (filterType === 'Subscription' && payment.isSubscription) ||
+               (filterType === 'Event' && !payment.isSubscription);
+          return statusMatch && typeMatch;
+     });
 
      const sortedPayments = [...filteredPayments].sort((a, b) => {
           if (sortBy === 'date') {
@@ -208,6 +270,12 @@ const PaymentHistory = () => {
           setCurrentPage(1);
      };
 
+     // Handle type filter change
+     const handleTypeFilterChange = (type) => {
+          setFilterType(type);
+          setCurrentPage(1);
+     };
+
      // Format currency
      const formatCurrency = (amount, currency) => {
           return new Intl.NumberFormat('en-BD', {
@@ -223,6 +291,13 @@ const PaymentHistory = () => {
           Completed: payments.filter(p => p.status === 'Completed').length,
           Pending: payments.filter(p => p.status === 'Pending').length,
           Failed: payments.filter(p => p.status === 'Failed').length
+     };
+
+     // Get type counts
+     const typeCounts = {
+          All: payments.length,
+          Event: payments.filter(p => !p.isSubscription).length,
+          Subscription: payments.filter(p => p.isSubscription).length
      };
 
      // Generate page numbers with ellipsis
@@ -275,7 +350,7 @@ const PaymentHistory = () => {
                     </div>
 
                     {/* Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
                          {Object.entries(statusCounts).map(([status, count]) => (
                               <div
                                    key={status}
@@ -292,6 +367,28 @@ const PaymentHistory = () => {
                               >
                                    <p className="text-2xl font-bold text-white">{count}</p>
                                    <p className="text-white opacity-90 capitalize">{status}</p>
+                              </div>
+                         ))}
+                    </div>
+
+                    {/* Type Filter Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                         {Object.entries(typeCounts).map(([type, count]) => (
+                              <div
+                                   key={type}
+                                   onClick={() => handleTypeFilterChange(type)}
+                                   className={`rounded-lg shadow-lg p-4 text-center cursor-pointer transform transition-all duration-200 hover:scale-105 ${filterType === type ? 'ring-2 ring-offset-2' : ''
+                                        }`}
+                                   style={{
+                                        backgroundColor: secondaryColor,
+                                        ...(filterType === type && {
+                                             ringColor: primaryColor,
+                                             ringOffsetColor: lightBg
+                                        })
+                                   }}
+                              >
+                                   <p className="text-2xl font-bold text-white">{count}</p>
+                                   <p className="text-white opacity-90 capitalize">{type} Payments</p>
                               </div>
                          ))}
                     </div>
@@ -335,7 +432,7 @@ const PaymentHistory = () => {
                                                   Transaction ID
                                              </th>
                                              <th className="px-6 py-4 text-left text-sm font-semibold tracking-wider" style={{ color: textColor }}>
-                                                  Event & User
+                                                  Event / Subscription
                                              </th>
                                              <th className="px-6 py-4 text-left text-sm font-semibold tracking-wider" style={{ color: textColor }}>
                                                   Amount
@@ -348,6 +445,9 @@ const PaymentHistory = () => {
                                              </th>
                                              <th className="px-6 py-4 text-left text-sm font-semibold tracking-wider" style={{ color: textColor }}>
                                                   Date
+                                             </th>
+                                             <th className="px-6 py-4 text-left text-sm font-semibold tracking-wider" style={{ color: textColor }}>
+                                                  Type
                                              </th>
                                         </tr>
                                    </thead>
@@ -368,8 +468,16 @@ const PaymentHistory = () => {
                                                             </div>
                                                        </td>
                                                        <td className="px-6 py-4">
-                                                            <div className="text-sm font-semibold" style={{ color: textColor }}>
-                                                                 {payment.eventTitle}
+                                                            <div className="flex items-center space-x-2">
+                                                                 <div className="text-sm font-semibold" style={{ color: textColor }}>
+                                                                      {payment.eventTitle}
+                                                                 </div>
+                                                                 {payment.isSubscription && (
+                                                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold text-white"
+                                                                           style={{ backgroundColor: secondaryColor }}>
+                                                                           Subscription
+                                                                      </span>
+                                                                 )}
                                                             </div>
                                                             <div className="text-sm" style={{ color: secondaryColor }}>
                                                                  {payment.userName}
@@ -401,7 +509,11 @@ const PaymentHistory = () => {
                                                                  {payment.date}
                                                             </div>
                                                        </td>
-                                                      
+                                                       <td className="px-6 py-4 whitespace-nowrap">
+                                                            <div className="text-sm font-semibold capitalize" style={{ color: secondaryColor }}>
+                                                                 {payment.isSubscription ? 'Subscription' : 'Event'}
+                                                            </div>
+                                                       </td>
                                                   </tr>
                                              ))
                                         ) : (
@@ -425,8 +537,8 @@ const PaymentHistory = () => {
                                    onClick={() => handlePageChange(currentPage - 1)}
                                    disabled={currentPage === 1}
                                    className={`px-5 py-3 text-base font-semibold rounded-lg transition-all duration-200 ${currentPage === 1
-                                             ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                             : 'text-white hover:shadow-lg transform hover:scale-105'
+                                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                        : 'text-white hover:shadow-lg transform hover:scale-105'
                                         }`}
                                    style={{
                                         backgroundColor: currentPage === 1 ? '#E8DFCB' : primaryColor
@@ -459,8 +571,8 @@ const PaymentHistory = () => {
                                              key={index}
                                              onClick={() => handlePageChange(page)}
                                              className={`px-5 py-3 text-base font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 ${currentPage === page
-                                                       ? 'text-white shadow-lg'
-                                                       : 'text-white'
+                                                  ? 'text-white shadow-lg'
+                                                  : 'text-white'
                                                   }`}
                                              style={{
                                                   backgroundColor: currentPage === page ? secondaryColor : primaryColor
@@ -485,8 +597,8 @@ const PaymentHistory = () => {
                                    onClick={() => handlePageChange(currentPage + 1)}
                                    disabled={currentPage === totalPages}
                                    className={`px-5 py-3 text-base font-semibold rounded-lg transition-all duration-200 ${currentPage === totalPages
-                                             ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                             : 'text-white hover:shadow-lg transform hover:scale-105'
+                                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                        : 'text-white hover:shadow-lg transform hover:scale-105'
                                         }`}
                                    style={{
                                         backgroundColor: currentPage === totalPages ? '#E8DFCB' : primaryColor
@@ -540,6 +652,34 @@ const PaymentHistory = () => {
                                         {payments.filter(p => p.status === 'Failed').length}
                                    </p>
                                    <p style={{ color: secondaryColor }}>Failed Payments</p>
+                              </div>
+                         </div>
+
+                         {/* Subscription Specific Summary */}
+                         <div className="mt-6 pt-6 border-t" style={{ borderColor: borderColor }}>
+                              <h4 className="text-lg font-semibold mb-3" style={{ color: textColor }}>Subscription Summary</h4>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                   <div className="text-center p-3 rounded-lg" style={{ backgroundColor: lightBg }}>
+                                        <p className="text-xl font-bold" style={{ color: textColor }}>
+                                             {payments.filter(p => p.isSubscription).length}
+                                        </p>
+                                        <p style={{ color: secondaryColor }}>Total Subscriptions</p>
+                                   </div>
+                                   <div className="text-center p-3 rounded-lg" style={{ backgroundColor: lightBg }}>
+                                        <p className="text-xl font-bold" style={{ color: textColor }}>
+                                             {formatCurrency(
+                                                  payments.filter(p => p.isSubscription && p.status === 'Completed').reduce((sum, p) => sum + p.amount, 0),
+                                                  'BDT'
+                                             )}
+                                        </p>
+                                        <p style={{ color: secondaryColor }}>Subscription Revenue</p>
+                                   </div>
+                                   <div className="text-center p-3 rounded-lg" style={{ backgroundColor: lightBg }}>
+                                        <p className="text-xl font-bold" style={{ color: textColor }}>
+                                             {payments.filter(p => p.isSubscription && p.status === 'Completed').length}
+                                        </p>
+                                        <p style={{ color: secondaryColor }}>Active Subscriptions</p>
+                                   </div>
                               </div>
                          </div>
                     </div>
