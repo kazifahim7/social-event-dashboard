@@ -10,11 +10,11 @@ const Navbar = () => {
               </div>
 
                {/* Right: Profile Image */}
-               <div title="admin" className="w-10 h-10 rounded-full overflow-hidden border-2 border-yellow-400">
+               <div title="admin" className="w-10 hidden h-10 rounded-full overflow-hidden border-2 border-yellow-400">
                     <img
                          src="https://i.postimg.cc/cJvwfRR7/image-2.png" 
                          alt="User"
-                         className="w-full h-full object-cover"
+                         className="w-full hidden h-full object-cover"
                     />
                </div>
           </nav>

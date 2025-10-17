@@ -311,12 +311,14 @@ const EventManagement = () => {
      };
 
      return (
+
           <div className="min-h-screen" style={{ backgroundColor: lightBg }}>
+               
                <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="text-center mb-12">
-                         <h1 className="text-4xl font-bold mb-4" style={{ color: textColor }}>
-                              Event Management System
+                         <h1 className="text-4xl font-bold mb-4 " style={{ color: textColor }}>
+                              Event management system
                          </h1>
                          <p className="text-lg" style={{ color: secondaryColor }}>
                               Manage your events with powerful tools and insights

@@ -35,7 +35,7 @@ export default function UserManagement() {
 
                const data = await res.json();
                setUsers(data.data?.users || []);
-               setTotalUsers(data.data?.total || 0);
+               setTotalUsers(data.data?.users.length || 0);
           } catch (err) {
                console.error("Error fetching dashboard:", err.message);
                Swal.fire({
