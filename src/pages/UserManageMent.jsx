@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { AiOutlineDelete } from "react-icons/ai";
+import { AiOutlineDelete, AiOutlineSearch } from "react-icons/ai";
 import { MdBlock } from "react-icons/md";
 import { IoDocumentLockOutline } from "react-icons/io5";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle, FaUser, FaEnvelope, FaCalendar, FaIdCard, FaPhone, FaClock, FaStar } from "react-icons/fa";
 import { approveUser, blockUser, unblockUser, deleteUser } from "../service/userManagement";
 
 export default function UserManagement() {
@@ -13,6 +13,8 @@ export default function UserManagement() {
      const [totalUsers, setTotalUsers] = useState(0);
      const [selectedUser, setSelectedUser] = useState(null);
      const [users, setUsers] = useState([]);
+     const [searchTerm, setSearchTerm] = useState("");
+     const [filteredUsers, setFilteredUsers] = useState([]);
 
      const [loading, setLoading] = useState({
           approve: null,
@@ -35,6 +37,7 @@ export default function UserManagement() {
 
                const data = await res.json();
                setUsers(data.data?.users || []);
+               setFilteredUsers(data.data?.users || []);
                setTotalUsers(data.data?.users.length || 0);
           } catch (err) {
                console.error("Error fetching dashboard:", err.message);
@@ -51,6 +54,21 @@ export default function UserManagement() {
      useEffect(() => {
           fetchDashboard();
      }, []);
+
+     // Search functionality
+     useEffect(() => {
+          if (searchTerm.trim() === "") {
+               setFilteredUsers(users);
+          } else {
+               const filtered = users.filter(user =>
+                    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    user.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    (user.phoneNumber && user.phoneNumber.includes(searchTerm))
+               );
+               setFilteredUsers(filtered);
+          }
+     }, [searchTerm, users]);
 
      // Handle page change
      const handlePageChange = (page) => {
@@ -224,6 +242,18 @@ export default function UserManagement() {
           });
      };
 
+     // Format date function
+     const formatDate = (dateString) => {
+          if (!dateString) return 'N/A';
+          return new Date(dateString).toLocaleDateString('en-US', {
+               year: 'numeric',
+               month: 'short',
+               day: 'numeric',
+               hour: '2-digit',
+               minute: '2-digit'
+          });
+     };
+
      return (
           <div className="p-6 bg-gray-50 min-h-screen">
                {/* Dashboard Loading */}
@@ -238,255 +268,490 @@ export default function UserManagement() {
                     </div>
                )}
 
-               <div className="bg-white shadow rounded p-4">
-                    <div className="flex justify-between items-center mb-4">
-                         <h2 className="text-lg font-semibold">User Management</h2>
-                         <div className="text-sm text-gray-600">
-                              Total Users: {totalUsers}
+               <div className="bg-white shadow-sm rounded-xl border border-gray-100 overflow-hidden">
+                    {/* Header with Search */}
+                    <div className="p-6 border-b border-gray-100">
+                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                              <div>
+                                   <h2 className="text-2xl font-bold text-gray-800">User Management</h2>
+                                   <p className="text-gray-600 text-sm mt-1">Manage and view all user accounts</p>
+                              </div>
+                              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                                   <div className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                                        Total Users: <span className="font-semibold text-gray-800">{totalUsers}</span>
+                                   </div>
+                                   <div className="relative">
+                                        <AiOutlineSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                        <input
+                                             type="text"
+                                             placeholder="Search by name, email, ID..."
+                                             value={searchTerm}
+                                             onChange={(e) => setSearchTerm(e.target.value)}
+                                             className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
+                                        />
+                                   </div>
+                              </div>
                          </div>
                     </div>
 
-                    <table className="w-full table-auto border-collapse overflow-x-auto">
-                         <thead>
-                              <tr className="bg-[#DACBA4]">
-                                   <th className="py-2 px-4 text-left">Name</th>
-                                   <th className="py-2 px-4 text-left">Email</th>
-                                   <th className="py-2 px-4 text-left">events Created</th>
-                                   <th className="py-2 px-4 text-left">events Joined</th>
-                                   <th className="py-2 px-4 text-left">Status</th>
-                                   <th className="py-2 px-4 text-left">Approval</th>
-                                   <th className="py-2 px-4 text-left">Action</th>
-                              </tr>
-                         </thead>
-                         <tbody>
-                              {users.length > 0 ? (
-                                   users.map((user) => (
-                                        <tr
-                                             key={user.id}
-                                             className="border-b border-gray-100 hover:bg-gray-100 cursor-pointer"
-                                        >
-                                             <td
-                                                  onClick={() => setSelectedUser(user)}
-                                                  className="py-2 px-4 flex items-center gap-2"
+                    {/* Users Table */}
+                    <div className="overflow-x-auto">
+                         <table className="w-full">
+                              <thead>
+                                   <tr className="bg-gray-50 border-b border-gray-100">
+                                        <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">User</th>
+                                        <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">Email</th>
+                                        <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">Events Created</th>
+                                        <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">Events Joined</th>
+                                        <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">Status</th>
+                                        <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">Approval</th>
+                                        <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">Actions</th>
+                                   </tr>
+                              </thead>
+                              <tbody>
+                                   {filteredUsers.length > 0 ? (
+                                        filteredUsers.map((user) => (
+                                             <tr
+                                                  key={user.id}
+                                                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
                                              >
-                                                  <img
-                                                       src={user.photoURL}
-                                                       alt="avatar"
-                                                       className="w-8 h-8 rounded-full"
-                                                  />
-                                                  {user.name}
-                                             </td>
-                                             <td className="py-2 px-4">{user.email}</td>
-                                             <td className="py-2 px-4">{user?.subscription?.eventsCreated}</td>
-                                             <td className="py-2 px-4">{user?.subscription?.eventsJoined}</td>
-                                             <td className="py-2 px-4">
-                                                  <span
-                                                       className={`px-2 py-1 rounded-full text-white text-xs ${user.isBlocked ? "bg-red-500" : "bg-green-500"
-                                                            }`}
+                                                  <td
+                                                       onClick={() => setSelectedUser(user)}
+                                                       className="py-4 px-6 flex items-center gap-3"
                                                   >
-                                                       {user.isBlocked ? "Blocked" : "Active"}
-                                                  </span>
-                                             </td>
-                                             <td className="py-2 px-4">
-                                                  <span
-                                                       className={`px-2 py-1 rounded-full text-white text-xs ${user.isApproved ? "bg-green-500" : "bg-yellow-500"
-                                                            }`}
-                                                  >
-                                                       {user.isApproved ? "Approved" : "Pending"}
-                                                  </span>
-                                             </td>
-                                             <td className="py-2 px-4 flex gap-3">
-                                                  {/* Approve Button - Show only if not approved */}
-                                                  {!user.isApproved && (
-                                                       <button
-                                                            onClick={(e) => {
-                                                                 e.stopPropagation();
-                                                                 handleApproveUser(user.id);
-                                                            }}
-                                                            className="cursor-pointer text-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                            title="Approve User"
-                                                            disabled={loading.approve === user.id}
+                                                       <img
+                                                            src={user.photoURL}
+                                                            alt="avatar"
+                                                            className="w-10 h-10 rounded-full border-2 border-gray-200"
+                                                       />
+                                                       <div>
+                                                            <p className="font-medium text-gray-900">{user.name}</p>
+                                                            <p className="text-sm text-gray-500">ID: {user.id}</p>
+                                                       </div>
+                                                  </td>
+                                                  <td className="py-4 px-6">
+                                                       <div className="flex items-center gap-2">
+                                                            <FaEnvelope className="text-gray-400 text-sm" />
+                                                            <span className="text-gray-700">{user.email}</span>
+                                                       </div>
+                                                  </td>
+                                                  <td className="py-4 px-6">
+                                                       <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                                            {user?.subscription?.eventsCreated || 0}
+                                                       </span>
+                                                  </td>
+                                                  <td className="py-4 px-6">
+                                                       <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                                            {user?.subscription?.eventsJoined || 0}
+                                                       </span>
+                                                  </td>
+                                                  <td className="py-4 px-6">
+                                                       <span
+                                                            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${user.isBlocked
+                                                                 ? "bg-red-100 text-red-800"
+                                                                 : "bg-green-100 text-green-800"
+                                                                 }`}
                                                        >
-                                                            {loading.approve === user.id ? (
-                                                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-600"></div>
-                                                            ) : (
-                                                                 <FaCheckCircle className="text-lg" />
+                                                            {user.isBlocked ? "Blocked" : "Active"}
+                                                       </span>
+                                                  </td>
+                                                  <td className="py-4 px-6">
+                                                       <span
+                                                            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${user.isApproved
+                                                                 ? "bg-green-100 text-green-800"
+                                                                 : "bg-yellow-100 text-yellow-800"
+                                                                 }`}
+                                                       >
+                                                            {user.isApproved ? "Approved" : "Pending"}
+                                                       </span>
+                                                  </td>
+                                                  <td className="py-4 px-6">
+                                                       <div className="flex items-center gap-2">
+                                                            {/* Approve Button */}
+                                                            {!user.isApproved && (
+                                                                 <button
+                                                                      onClick={(e) => {
+                                                                           e.stopPropagation();
+                                                                           handleApproveUser(user.id);
+                                                                      }}
+                                                                      className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                      title="Approve User"
+                                                                      disabled={loading.approve === user.id}
+                                                                 >
+                                                                      {loading.approve === user.id ? (
+                                                                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+                                                                      ) : (
+                                                                           <FaCheckCircle className="text-base" />
+                                                                      )}
+                                                                      Approve
+                                                                 </button>
                                                             )}
-                                                       </button>
-                                                  )}
 
-                                                  {/* Block/Unblock Button */}
-                                                  <button
-                                                       onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleToggleBlock(user.id, user.isBlocked);
-                                                       }}
-                                                       className="cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                                                       title={user.isBlocked ? "Unblock User" : "Block User"}
-                                                       disabled={loading.block === user.id}
-                                                  >
-                                                       {loading.block === user.id ? (
-                                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600"></div>
-                                                       ) : user.isBlocked ? (
-                                                            <IoDocumentLockOutline className="text-green-600 text-lg" />
-                                                       ) : (
-                                                            <MdBlock className="text-red-600 text-lg" />
-                                                       )}
-                                                  </button>
+                                                            {/* Block/Unblock Button */}
+                                                            <button
+                                                                 onClick={(e) => {
+                                                                      e.stopPropagation();
+                                                                      handleToggleBlock(user.id, user.isBlocked);
+                                                                 }}
+                                                                 className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${user.isBlocked
+                                                                      ? "text-green-700 bg-green-50 hover:bg-green-100"
+                                                                      : "text-red-700 bg-red-50 hover:bg-red-100"
+                                                                      }`}
+                                                                 title={user.isBlocked ? "Unblock User" : "Block User"}
+                                                                 disabled={loading.block === user.id}
+                                                            >
+                                                                 {loading.block === user.id ? (
+                                                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                                                                 ) : user.isBlocked ? (
+                                                                      <IoDocumentLockOutline className="text-base" />
+                                                                 ) : (
+                                                                      <MdBlock className="text-base" />
+                                                                 )}
+                                                                 {user.isBlocked ? "Unblock" : "Block"}
+                                                            </button>
 
-                                                  {/* Delete Button */}
-                                                  <button
-                                                       onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleDeleteUser(user.id);
-                                                       }}
-                                                       className="cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                                                       title="Delete User"
-                                                       disabled={loading.delete === user.id}
-                                                  >
-                                                       {loading.delete === user.id ? (
-                                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600"></div>
-                                                       ) : (
-                                                            <AiOutlineDelete className="text-red-600 text-lg" />
-                                                       )}
-                                                  </button>
+                                                            {/* Delete Button */}
+                                                            <button
+                                                                 onClick={(e) => {
+                                                                      e.stopPropagation();
+                                                                      handleDeleteUser(user.id);
+                                                                 }}
+                                                                 className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-red-700 bg-red-50 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                 title="Delete User"
+                                                                 disabled={loading.delete === user.id}
+                                                            >
+                                                                 {loading.delete === user.id ? (
+                                                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                                                                 ) : (
+                                                                      <AiOutlineDelete className="text-base" />
+                                                                 )}
+                                                                 Delete
+                                                            </button>
+                                                       </div>
+                                                  </td>
+                                             </tr>
+                                        ))
+                                   ) : (
+                                        <tr>
+                                             <td colSpan="7" className="py-8 px-6 text-center">
+                                                  <div className="flex flex-col items-center justify-center text-gray-500">
+                                                       <AiOutlineSearch className="text-4xl mb-2 text-gray-300" />
+                                                       <p className="text-lg font-medium">No users found</p>
+                                                       <p className="text-sm">
+                                                            {searchTerm ? `No results for "${searchTerm}"` : "No users available"}
+                                                       </p>
+                                                  </div>
                                              </td>
                                         </tr>
-                                   ))
-                              ) : (
-                                   <tr>
-                                        <td colSpan="5" className="py-4 px-4 text-center text-gray-500">
-                                             No users found
-                                        </td>
-                                   </tr>
-                              )}
-                         </tbody>
-                    </table>
+                                   )}
+                              </tbody>
+                         </table>
+                    </div>
 
                     {/* Pagination */}
                     {totalPages > 1 && (
-                         <div className="flex justify-center items-center mt-6 space-x-2">
-                              {/* Previous Button */}
-                              <button
-                                   onClick={() => handlePageChange(currentPage - 1)}
-                                   disabled={currentPage === 1}
-                                   className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
-                              >
-                                   Previous
-                              </button>
-
-                              {/* Page Numbers */}
-                              {getPageNumbers().map(page => (
+                         <div className="flex justify-center items-center p-6 border-t border-gray-100">
+                              <div className="flex items-center space-x-2">
+                                   {/* Previous Button */}
                                    <button
-                                        key={page}
-                                        onClick={() => handlePageChange(page)}
-                                        className={`px-3 py-1 rounded border ${currentPage === page
-                                             ? 'bg-[#DACBA4] text-white border-[#DACBA4]'
-                                             : 'border-gray-300 hover:bg-gray-100'
-                                             }`}
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                        className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
                                    >
-                                        {page}
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                        Previous
                                    </button>
-                              ))}
 
-                              {/* Next Button */}
-                              <button
-                                   onClick={() => handlePageChange(currentPage + 1)}
-                                   disabled={currentPage === totalPages}
-                                   className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
-                              >
-                                   Next
-                              </button>
+                                   {/* Page Numbers */}
+                                   {getPageNumbers().map(page => (
+                                        <button
+                                             key={page}
+                                             onClick={() => handlePageChange(page)}
+                                             className={`px-4 py-2 rounded-lg border font-medium ${currentPage === page
+                                                  ? 'bg-blue-500 text-white border-blue-500'
+                                                  : 'border-gray-300 text-gray-700 hover:bg-gray-100'
+                                                  } transition-colors`}
+                                        >
+                                             {page}
+                                        </button>
+                                   ))}
+
+                                   {/* Next Button */}
+                                   <button
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                        className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+                                   >
+                                        Next
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                   </button>
+                              </div>
                          </div>
                     )}
                </div>
 
-               {/* Modal */}
+               {/* Modern User Details Modal */}
                {selectedUser && (
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                         <div className="bg-white rounded-lg p-6 w-96 relative">
-                              <button
-                                   className="absolute top-2 right-2 text-gray-500"
-                                   onClick={() => setSelectedUser(null)}
-                                   disabled={loading.approve === selectedUser.id || loading.block === selectedUser.id || loading.delete === selectedUser.id}
-                              >
-                                   ✖
-                              </button>
-                              <h3 className="text-xl font-semibold mb-4">User Details</h3>
-                              <div className="flex flex-col items-center gap-4 mb-4">
-                                   <img
-                                        src={selectedUser.photoURL}
-                                        alt="avatar"
-                                        className="w-16 h-16 rounded-full"
-                                   />
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+                              {/* Header */}
+                              <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
                                    <div>
-                                        <p className="font-semibold">{selectedUser.name}</p>
-                                        <p className="text-gray-500">{selectedUser.email}</p>
+                                        <h3 className="text-2xl font-bold text-gray-800">User Details</h3>
+                                        <p className="text-gray-500 text-sm mt-1">Complete user information and management</p>
                                    </div>
-                              </div>
-                              <div className="space-y-2">
-                                   <p>
-                                        <strong>Status:</strong>{" "}
-                                        <span
-                                             className={`px-2 py-1 rounded-full text-white text-xs ${selectedUser.isBlocked ? "bg-red-500" : "bg-green-500"
-                                                  }`}
-                                        >
-                                             {selectedUser.isBlocked ? "Blocked" : "Active"}
-                                        </span>
-                                   </p>
-                                   <p>
-                                        <strong>Approval:</strong>{" "}
-                                        <span
-                                             className={`px-2 py-1 rounded-full text-white text-xs ${selectedUser.isApproved ? "bg-green-500" : "bg-yellow-500"
-                                                  }`}
-                                        >
-                                             {selectedUser.isApproved ? "Approved" : "Pending"}
-                                        </span>
-                                   </p>
+                                   <button
+                                        className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full"
+                                        onClick={() => setSelectedUser(null)}
+                                        disabled={loading.approve === selectedUser.id || loading.block === selectedUser.id || loading.delete === selectedUser.id}
+                                   >
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                   </button>
                               </div>
 
-                              {/* Action Buttons in Modal */}
-                              <div className="flex gap-3 mt-4">
-                                   {!selectedUser.isApproved && (
+                              {/* Scrollable Content */}
+                              <div className="overflow-y-auto max-h-[calc(90vh-200px)] p-6">
+                                   {/* Profile Section */}
+                                   <div className="flex items-start gap-6 mb-8 pb-6 border-b border-gray-100">
+                                        <img
+                                             src={selectedUser.photoURL}
+                                             alt="avatar"
+                                             className="w-20 h-20 rounded-2xl border-4 border-white shadow-lg"
+                                        />
+                                        <div className="flex-1">
+                                             <div className="flex items-center gap-3 mb-2">
+                                                  <h4 className="text-xl font-bold text-gray-800">{selectedUser.name}</h4>
+                                                  <div className="flex gap-1">
+                                                       <span
+                                                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${selectedUser.isBlocked
+                                                                 ? "bg-red-100 text-red-800"
+                                                                 : "bg-green-100 text-green-800"
+                                                                 }`}
+                                                       >
+                                                            {selectedUser.isBlocked ? "Blocked" : "Active"}
+                                                       </span>
+                                                       <span
+                                                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${selectedUser.isApproved
+                                                                 ? "bg-green-100 text-green-800"
+                                                                 : "bg-yellow-100 text-yellow-800"
+                                                                 }`}
+                                                       >
+                                                            {selectedUser.isApproved ? "Approved" : "Pending"}
+                                                       </span>
+                                                  </div>
+                                             </div>
+                                             <p className="text-gray-600 mb-1 flex items-center gap-2">
+                                                  <FaEnvelope className="text-gray-400" />
+                                                  {selectedUser.email}
+                                             </p>
+                                             <p className="text-gray-600 flex items-center gap-2">
+                                                  <FaIdCard className="text-gray-400" />
+                                                  ID: {selectedUser.id}
+                                             </p>
+                                        </div>
+                                   </div>
+
+                                   {/* Stats Grid */}
+                                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                        <div className="bg-blue-50 p-4 rounded-xl text-center">
+                                             <div className="text-2xl font-bold text-blue-700 mb-1">{selectedUser.subscription?.eventsJoined || 0}</div>
+                                             <div className="text-sm text-blue-600 font-medium">Events Joined</div>
+                                        </div>
+                                        <div className="bg-green-50 p-4 rounded-xl text-center">
+                                             <div className="text-2xl font-bold text-green-700 mb-1">{selectedUser.subscription?.eventsCreated || 0}</div>
+                                             <div className="text-sm text-green-600 font-medium">Events Created</div>
+                                        </div>
+                                        <div className="bg-purple-50 p-4 rounded-xl text-center">
+                                             <div className="text-2xl font-bold text-purple-700 mb-1">{selectedUser.subscription?.subscriptionTier || "Free"}</div>
+                                             <div className="text-sm text-purple-600 font-medium">Subscription Tier</div>
+                                        </div>
+                                        <div className="bg-orange-50 p-4 rounded-xl text-center">
+                                             <div className="text-2xl font-bold text-orange-700 mb-1">
+                                                  {(selectedUser.subscription?.eventsJoined || 0) + (selectedUser.subscription?.eventsCreated || 0)}
+                                             </div>
+                                             <div className="text-sm text-orange-600 font-medium">Total Events</div>
+                                        </div>
+                                   </div>
+
+                                   {/* Detailed Information */}
+                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {/* Personal Information */}
+                                        <div className="space-y-4">
+                                             <h5 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                                                  <FaUser className="text-blue-500" />
+                                                  Personal Information
+                                             </h5>
+                                             <div className="space-y-3">
+                                                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                                       <span className="text-gray-600 font-medium">Full Name</span>
+                                                       <span className="text-gray-800">{selectedUser.name}</span>
+                                                  </div>
+                                                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                                       <span className="text-gray-600 font-medium">Email Address</span>
+                                                       <span className="text-gray-800">{selectedUser.email}</span>
+                                                  </div>
+                                                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                                       <span className="text-gray-600 font-medium">User ID</span>
+                                                       <span className="text-gray-800 font-mono text-sm">{selectedUser.id}</span>
+                                                  </div>
+                                                  {selectedUser.phoneNumber && (
+                                                       <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                                            <span className="text-gray-600 font-medium">Phone</span>
+                                                            <span className="text-gray-800 flex items-center gap-2">
+                                                                 <FaPhone className="text-gray-400 text-sm" />
+                                                                 {selectedUser.phoneNumber}
+                                                            </span>
+                                                       </div>
+                                                  )}
+                                             </div>
+                                        </div>
+
+                                        {/* Account Information */}
+                                        <div className="space-y-4">
+                                             <h5 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                                                  <FaIdCard className="text-green-500" />
+                                                  Account Information
+                                             </h5>
+                                             <div className="space-y-3">
+                                                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                                       <span className="text-gray-600 font-medium">Account Status</span>
+                                                       <span
+                                                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${selectedUser.isBlocked
+                                                                 ? "bg-red-100 text-red-800"
+                                                                 : "bg-green-100 text-green-800"
+                                                                 }`}
+                                                       >
+                                                            {selectedUser.isBlocked ? "Blocked" : "Active"}
+                                                       </span>
+                                                  </div>
+                                                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                                       <span className="text-gray-600 font-medium">Approval Status</span>
+                                                       <span
+                                                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${selectedUser.isApproved
+                                                                 ? "bg-green-100 text-green-800"
+                                                                 : "bg-yellow-100 text-yellow-800"
+                                                                 }`}
+                                                       >
+                                                            {selectedUser.isApproved ? "Approved" : "Pending Approval"}
+                                                       </span>
+                                                  </div>
+                                                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                                       <span className="text-gray-600 font-medium">Member Since</span>
+                                                       <span className="text-gray-800 flex items-center gap-2">
+                                                            <FaCalendar className="text-gray-400 text-sm" />
+                                                            {formatDate(selectedUser.createdAt)}
+                                                       </span>
+                                                  </div>
+                                                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                                       <span className="text-gray-600 font-medium">Last Active</span>
+                                                       <span className="text-gray-800 flex items-center gap-2">
+                                                            <FaClock className="text-gray-400 text-sm" />
+                                                            {formatDate(selectedUser.lastLogin)}
+                                                       </span>
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+
+                                   {/* Subscription Details */}
+                                   {selectedUser.subscription && (
+                                        <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
+                                             <h5 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                                  <FaStar className="text-purple-500" />
+                                                  Subscription Details
+                                             </h5>
+                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                  <div className="text-center">
+                                                       <div className="text-sm text-purple-600 font-medium">Tier</div>
+                                                       <div className="text-lg font-bold text-purple-700">{selectedUser.subscription.subscriptionTier || "Free"}</div>
+                                                  </div>
+                                                  <div className="text-center">
+                                                       <div className="text-sm text-purple-600 font-medium">Events Created</div>
+                                                       <div className="text-lg font-bold text-purple-700">{selectedUser.subscription.eventsCreated || 0}</div>
+                                                  </div>
+                                                  <div className="text-center">
+                                                       <div className="text-sm text-purple-600 font-medium">Events Joined</div>
+                                                       <div className="text-lg font-bold text-purple-700">{selectedUser.subscription.eventsJoined || 0}</div>
+                                                  </div>
+                                                  <div className="text-center">
+                                                       <div className="text-sm text-purple-600 font-medium">Total Events</div>
+                                                       <div className="text-lg font-bold text-purple-700">
+                                                            {(selectedUser.subscription.eventsJoined || 0) + (selectedUser.subscription.eventsCreated || 0)}
+                                                       </div>
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   )}
+                              </div>
+
+                              {/* Action Buttons */}
+                              <div className="border-t border-gray-100 p-6 bg-gray-50">
+                                   <div className="flex flex-wrap gap-3 justify-end">
+                                        {!selectedUser.isApproved && (
+                                             <button
+                                                  onClick={() => {
+                                                       handleApproveUser(selectedUser.id);
+                                                  }}
+                                                  className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-sm"
+                                                  disabled={loading.approve === selectedUser.id}
+                                             >
+                                                  {loading.approve === selectedUser.id ? (
+                                                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                  ) : (
+                                                       <FaCheckCircle className="text-lg" />
+                                                  )}
+                                                  Approve User
+                                             </button>
+                                        )}
+
                                         <button
                                              onClick={() => {
-                                                  handleApproveUser(selectedUser.id);
+                                                  handleToggleBlock(selectedUser.id, selectedUser.isBlocked);
                                              }}
-                                             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                                             disabled={loading.approve === selectedUser.id}
+                                             className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-sm ${selectedUser.isBlocked
+                                                  ? "bg-green-500 text-white hover:bg-green-600"
+                                                  : "bg-red-500 text-white hover:bg-red-600"
+                                                  }`}
+                                             disabled={loading.block === selectedUser.id}
                                         >
-                                             {loading.approve === selectedUser.id && (
+                                             {loading.block === selectedUser.id ? (
                                                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                             ) : selectedUser.isBlocked ? (
+                                                  <IoDocumentLockOutline className="text-lg" />
+                                             ) : (
+                                                  <MdBlock className="text-lg" />
                                              )}
-                                             Approve
+                                             {selectedUser.isBlocked ? "Unblock User" : "Block User"}
                                         </button>
-                                   )}
 
-                                   <button
-                                        onClick={() => {
-                                             handleToggleBlock(selectedUser.id, selectedUser.isBlocked);
-                                        }}
-                                        className={`px-4 py-2 rounded text-white flex items-center gap-2 ${selectedUser.isBlocked ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"} disabled:opacity-50 disabled:cursor-not-allowed`}
-                                        disabled={loading.block === selectedUser.id}
-                                   >
-                                        {loading.block === selectedUser.id && (
-                                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                        )}
-                                        {selectedUser.isBlocked ? "Unblock" : "Block"}
-                                   </button>
+                                        <button
+                                             onClick={() => {
+                                                  handleDeleteUser(selectedUser.id);
+                                             }}
+                                             className="flex items-center gap-2 px-6 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-sm"
+                                             disabled={loading.delete === selectedUser.id}
+                                        >
+                                             {loading.delete === selectedUser.id ? (
+                                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                             ) : (
+                                                  <AiOutlineDelete className="text-lg" />
+                                             )}
+                                             Delete User
+                                        </button>
 
-                                   <button
-                                        onClick={() => {
-                                             handleDeleteUser(selectedUser.id);
-                                        }}
-                                        className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                                        disabled={loading.delete === selectedUser.id}
-                                   >
-                                        {loading.delete === selectedUser.id && (
-                                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                        )}
-                                        Delete
-                                   </button>
+                                        <button
+                                             onClick={() => setSelectedUser(null)}
+                                             className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 transition-colors font-medium"
+                                        >
+                                             Close
+                                        </button>
+                                   </div>
                               </div>
                          </div>
                     </div>

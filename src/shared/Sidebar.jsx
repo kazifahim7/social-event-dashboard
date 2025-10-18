@@ -124,7 +124,7 @@ const Sidebar = () => {
                                    >
                                         <BsFillHouseAddFill className='w-5 h-5' />
 
-                                        <span className='mx-4 font-medium'>Event ManageMent</span>
+                                        <span className='mx-4 font-medium'>Event Management</span>
                                    </NavLink>
                                    <NavLink
                                         to='/payment'
