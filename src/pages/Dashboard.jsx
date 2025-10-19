@@ -378,6 +378,7 @@ export default function Dashboard() {
                </div>
 
                {/* Modern User Details Modal */}
+               {/* Modern User Details Modal */}
                {selectedUser && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
@@ -400,45 +401,78 @@ export default function Dashboard() {
 
                               {/* Scrollable Content */}
                               <div className="overflow-y-auto max-h-[calc(90vh-200px)] p-6">
-                                   {/* Profile Section */}
-                                   <div className="flex items-start gap-6 mb-8 pb-6 border-b border-gray-100">
-                                        <img
-                                             src={selectedUser.photoURL}
-                                             alt="avatar"
-                                             className="w-20 h-20 rounded-2xl border-4 border-white shadow-lg"
-                                        />
-                                        <div className="flex-1">
-                                             <div className="flex items-center gap-3 mb-2">
-                                                  <h4 className="text-xl font-bold text-gray-800">{selectedUser.name}</h4>
-                                                  <div className="flex gap-1">
-                                                       <span
-                                                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${selectedUser.isBlocked
-                                                                 ? "bg-red-100 text-red-800"
-                                                                 : "bg-green-100 text-green-800"
-                                                                 }`}
-                                                       >
-                                                            {selectedUser.isBlocked ? "Blocked" : "Active"}
-                                                       </span>
-                                                       <span
-                                                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${selectedUser.isApproved
-                                                                 ? "bg-green-100 text-green-800"
-                                                                 : "bg-yellow-100 text-yellow-800"
-                                                                 }`}
-                                                       >
-                                                            {selectedUser.isApproved ? "Approved" : "Pending"}
-                                                       </span>
-                                                  </div>
+                                   {/* Cover Photo & Profile Section */}
+                                   <div className="relative mb-8 rounded-xl overflow-hidden">
+                                        {/* Cover Photo */}
+                                        {selectedUser.coverPhotoURL && (
+                                             <div className="h-32 bg-gradient-to-r from-blue-400 to-purple-500 rounded-t-xl">
+                                                  <img
+                                                       src={selectedUser.coverPhotoURL}
+                                                       alt="Cover"
+                                                       className="w-full h-full object-cover"
+                                                  />
                                              </div>
-                                             <p className="text-gray-600 mb-1 flex items-center gap-2">
-                                                  <FaEnvelope className="text-gray-400" />
-                                                  {selectedUser.email}
-                                             </p>
-                                             <p className="text-gray-600 flex items-center gap-2">
-                                                  <FaIdCard className="text-gray-400" />
-                                                  ID: {selectedUser.id}
-                                             </p>
+                                        )}
+
+                                        {/* Profile Info */}
+                                        <div className={`flex items-start gap-6 p-6 ${selectedUser.coverPhotoURL ? 'bg-white' : 'bg-gradient-to-r from-gray-50 to-white rounded-xl'}`}>
+                                             <img
+                                                  src={selectedUser.photoURL}
+                                                  alt="avatar"
+                                                  className="w-20 h-20 rounded-2xl border-4 border-white shadow-lg"
+                                             />
+                                             <div className="flex-1">
+                                                  <div className="flex items-center gap-3 mb-2">
+                                                       <h4 className="text-xl font-bold text-gray-800">{selectedUser.name}</h4>
+                                                       <div className="flex gap-1">
+                                                            <span
+                                                                 className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${selectedUser.isBlocked
+                                                                      ? "bg-red-100 text-red-800"
+                                                                      : "bg-green-100 text-green-800"
+                                                                      }`}
+                                                            >
+                                                                 {selectedUser.isBlocked ? "Blocked" : "Active"}
+                                                            </span>
+                                                            <span
+                                                                 className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${selectedUser.isApproved
+                                                                      ? "bg-green-100 text-green-800"
+                                                                      : "bg-yellow-100 text-yellow-800"
+                                                                      }`}
+                                                            >
+                                                                 {selectedUser.isApproved ? "Approved" : "Pending"}
+                                                            </span>
+                                                            {selectedUser.verified && (
+                                                                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                                      Verified
+                                                                 </span>
+                                                            )}
+                                                       </div>
+                                                  </div>
+                                                  <p className="text-gray-600 mb-1 flex items-center gap-2">
+                                                       <FaEnvelope className="text-gray-400" />
+                                                       {selectedUser.email}
+                                                  </p>
+                                                  <p className="text-gray-600 flex items-center gap-2">
+                                                       <FaIdCard className="text-gray-400" />
+                                                       ID: {selectedUser.id}
+                                                  </p>
+                                                  {selectedUser.profession && (
+                                                       <p className="text-gray-600 mt-2 flex items-center gap-2">
+                                                            <FaUser className="text-gray-400" />
+                                                            {selectedUser.profession}
+                                                       </p>
+                                                  )}
+                                             </div>
                                         </div>
                                    </div>
+
+                                   {/* Bio Section */}
+                                   {selectedUser.bio && (
+                                        <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                             <h5 className="text-lg font-semibold text-gray-800 mb-2">About</h5>
+                                             <p className="text-gray-700 leading-relaxed">{selectedUser.bio}</p>
+                                        </div>
+                                   )}
 
                                    {/* Stats Grid */}
                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -455,7 +489,9 @@ export default function Dashboard() {
                                              <div className="text-sm text-purple-600 font-medium">Subscription Tier</div>
                                         </div>
                                         <div className="bg-orange-50 p-4 rounded-xl text-center">
-                                             <div className="text-2xl font-bold text-orange-700 mb-1">{selectedUser.subscription?.totalEvents || 0}</div>
+                                             <div className="text-2xl font-bold text-orange-700 mb-1">
+                                                  {(selectedUser.subscription?.eventsJoined || 0) + (selectedUser.subscription?.eventsCreated || 0)}
+                                             </div>
                                              <div className="text-sm text-orange-600 font-medium">Total Events</div>
                                         </div>
                                    </div>
@@ -481,13 +517,22 @@ export default function Dashboard() {
                                                        <span className="text-gray-600 font-medium">User ID</span>
                                                        <span className="text-gray-800 font-mono text-sm">{selectedUser.id}</span>
                                                   </div>
-                                                  {selectedUser.phoneNumber && (
+                                                  {selectedUser.profession && (
                                                        <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                                                            <span className="text-gray-600 font-medium">Phone</span>
-                                                            <span className="text-gray-800 flex items-center gap-2">
-                                                                 <FaPhone className="text-gray-400 text-sm" />
-                                                                 {selectedUser.phoneNumber}
-                                                            </span>
+                                                            <span className="text-gray-600 font-medium">Profession</span>
+                                                            <span className="text-gray-800">{selectedUser.profession}</span>
+                                                       </div>
+                                                  )}
+                                                  {selectedUser.gender && (
+                                                       <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                                            <span className="text-gray-600 font-medium">Gender</span>
+                                                            <span className="text-gray-800 capitalize">{selectedUser.gender}</span>
+                                                       </div>
+                                                  )}
+                                                  {selectedUser.nationality && (
+                                                       <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                                            <span className="text-gray-600 font-medium">Nationality</span>
+                                                            <span className="text-gray-800">{selectedUser.nationality}</span>
                                                        </div>
                                                   )}
                                              </div>
@@ -523,6 +568,17 @@ export default function Dashboard() {
                                                        </span>
                                                   </div>
                                                   <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                                       <span className="text-gray-600 font-medium">Verification Status</span>
+                                                       <span
+                                                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${selectedUser.verified
+                                                                 ? "bg-blue-100 text-blue-800"
+                                                                 : "bg-gray-100 text-gray-800"
+                                                                 }`}
+                                                       >
+                                                            {selectedUser.verified ? "Verified" : "Not Verified"}
+                                                       </span>
+                                                  </div>
+                                                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
                                                        <span className="text-gray-600 font-medium">Member Since</span>
                                                        <span className="text-gray-800 flex items-center gap-2">
                                                             <FaCalendar className="text-gray-400 text-sm" />
@@ -533,12 +589,71 @@ export default function Dashboard() {
                                                        <span className="text-gray-600 font-medium">Last Active</span>
                                                        <span className="text-gray-800 flex items-center gap-2">
                                                             <FaClock className="text-gray-400 text-sm" />
-                                                            {formatDate(selectedUser.lastLogin)}
+                                                            {formatDate(selectedUser.lastOnline)}
+                                                       </span>
+                                                  </div>
+                                                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                                                       <span className="text-gray-600 font-medium">Profile Updated</span>
+                                                       <span className="text-gray-800 flex items-center gap-2">
+                                                            <FaCalendar className="text-gray-400 text-sm" />
+                                                            {formatDate(selectedUser.updatedAt)}
                                                        </span>
                                                   </div>
                                              </div>
                                         </div>
                                    </div>
+
+                                   {/* Social Links */}
+                                   {(selectedUser.linkedIn || selectedUser.instagram) && (
+                                        <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-100">
+                                             <h5 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                                  <FaStar className="text-blue-500" />
+                                                  Social Links
+                                             </h5>
+                                             <div className="flex flex-wrap gap-4">
+                                                  {selectedUser.linkedIn && (
+                                                       <div className="flex items-center gap-2">
+                                                            <span className="text-sm font-medium text-gray-600">LinkedIn:</span>
+                                                            <a
+                                                                 href={selectedUser.linkedIn}
+                                                                 target="_blank"
+                                                                 rel="noopener noreferrer"
+                                                                 className="text-blue-600 hover:text-blue-800 text-sm truncate max-w-xs"
+                                                            >
+                                                                 {selectedUser.linkedIn}
+                                                            </a>
+                                                       </div>
+                                                  )}
+                                                  {selectedUser.instagram && (
+                                                       <div className="flex items-center gap-2">
+                                                            <span className="text-sm font-medium text-gray-600">Instagram:</span>
+                                                            <span className="text-gray-800 text-sm">{selectedUser.instagram}</span>
+                                                       </div>
+                                                  )}
+                                             </div>
+                                        </div>
+                                   )}
+
+                                   {/* Gallery Photos */}
+                                   {selectedUser.galleryPhotos && selectedUser.galleryPhotos.length > 0 && (
+                                        <div className="mt-6">
+                                             <h5 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                                  <FaStar className="text-purple-500" />
+                                                  Gallery Photos ({selectedUser.galleryPhotos.length})
+                                             </h5>
+                                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                                                  {selectedUser.galleryPhotos.map((photo, index) => (
+                                                       <img
+                                                            key={index}
+                                                            src={photo}
+                                                            alt={`Gallery ${index + 1}`}
+                                                            className="w-full h-24 object-cover rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+                                                            onClick={() => window.open(photo, '_blank')}
+                                                       />
+                                                  ))}
+                                             </div>
+                                        </div>
+                                   )}
 
                                    {/* Subscription Details */}
                                    {selectedUser.subscription && (
@@ -562,7 +677,9 @@ export default function Dashboard() {
                                                   </div>
                                                   <div className="text-center">
                                                        <div className="text-sm text-purple-600 font-medium">Total Events</div>
-                                                       <div className="text-lg font-bold text-purple-700">{selectedUser.subscription.totalEvents || 0}</div>
+                                                       <div className="text-lg font-bold text-purple-700">
+                                                            {(selectedUser.subscription.eventsJoined || 0) + (selectedUser.subscription.eventsCreated || 0)}
+                                                       </div>
                                                   </div>
                                              </div>
                                         </div>
@@ -576,7 +693,6 @@ export default function Dashboard() {
                                              <button
                                                   onClick={() => {
                                                        handleApproveUser(selectedUser.id);
-                                                       setSelectedUser(null);
                                                   }}
                                                   className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-sm"
                                                   disabled={loading.approve === selectedUser.id}
@@ -593,7 +709,6 @@ export default function Dashboard() {
                                         <button
                                              onClick={() => {
                                                   handleToggleBlock(selectedUser.id, selectedUser.isBlocked);
-                                                  setSelectedUser(null);
                                              }}
                                              className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-sm ${selectedUser.isBlocked
                                                   ? "bg-green-500 text-white hover:bg-green-600"
@@ -614,7 +729,6 @@ export default function Dashboard() {
                                         <button
                                              onClick={() => {
                                                   handleDeleteUser(selectedUser.id);
-                                                  setSelectedUser(null);
                                              }}
                                              className="flex items-center gap-2 px-6 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-sm"
                                              disabled={loading.delete === selectedUser.id}
