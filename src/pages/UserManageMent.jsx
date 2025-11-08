@@ -28,11 +28,11 @@ export default function UserManagement() {
           const token = localStorage.getItem("token");
           try {
                const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/v1/admin/users?page=${page}&limit=${usersPerPage}`, {
-                    method: "POST",
-                    headers: {
-                         "Content-Type": "application/json",
-                         Authorization: `Bearer ${token}`,
-                    },
+                    method: "GET",
+                    headers: new Headers({
+                         "ngrok-skip-browser-warning": "true",
+                         Authorization: `${token}`,
+                    })
                });
 
                const data = await res.json();

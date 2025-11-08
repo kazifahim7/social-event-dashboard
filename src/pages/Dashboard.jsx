@@ -23,11 +23,11 @@ export default function Dashboard() {
           const token = localStorage.getItem("token");
           try {
                const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/v1/admin/dashboard`, {
-                    method: "POST",
-                    headers: {
-                         "Content-Type": "application/json",
-                         Authorization: `Bearer ${token}`,
-                    },
+                    method: "GET",
+                    headers: new Headers({
+                         "ngrok-skip-browser-warning": "true",
+                         Authorization: `${token}`,
+                    })
                });
 
                const data = await res.json();

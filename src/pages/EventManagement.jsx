@@ -29,16 +29,20 @@ const EventManagement = () => {
      const fetchEvents = async (page = 1, search = '', category = '') => {
           try {
                setLoading(true);
-               const response = await fetch('https://overcontritely-epagogic-vicky.ngrok-free.dev/api/v1/event', {
-                    method: 'POST',
-                    headers: {
-                         'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                         search: search || undefined,
-                         category: category !== 'All' ? category.toLowerCase() : undefined,
-                         page: page,
-                         limit: eventsPerPage
+
+               // Build query parameters
+               const params = new URLSearchParams();
+               if (search) params.append('search', search);
+               if (category && category !== 'All') params.append('category', category.toLowerCase());
+               params.append('page', page.toString());
+               params.append('limit', eventsPerPage.toString());
+
+               const url = `https://overcontritely-epagogic-vicky.ngrok-free.dev/api/v1/event?${params.toString()}`;
+
+               const response = await fetch(url, {
+                    method: 'GET',
+                    headers: new Headers({
+                         "ngrok-skip-browser-warning": "true"       
                     })
                });
 
@@ -47,9 +51,10 @@ const EventManagement = () => {
                }
 
                const data = await response.json();
+               console.log(data,"data")
 
                if (data.success) {
-                    // Transform API data to match your component structure
+                  
                     const transformedEvents = data.data.events.map(event => ({
                          id: event.id,
                          title: event.name,
@@ -76,7 +81,7 @@ const EventManagement = () => {
                               email: event.userID?.email || 'No email',
                               phone: 'Not provided'
                          },
-                         tags: [event.category] 
+                         tags: [event.category]
                     }));
 
                     setEvents(transformedEvents);
