@@ -37,12 +37,13 @@ const EventManagement = () => {
                params.append('page', page.toString());
                params.append('limit', eventsPerPage.toString());
 
-               const url = `https://overcontritely-epagogic-vicky.ngrok-free.dev/api/v1/event?${params.toString()}`;
+               const url = `https://server.momentumactivity.com/api/v1/event?${params.toString()}`;
 
                const response = await fetch(url, {
                     method: 'GET',
                     headers: new Headers({
-                         "ngrok-skip-browser-warning": "true"       
+                         "ngrok-skip-browser-warning": "true",
+                         Authorization: `${localStorage.getItem("token")}`,
                     })
                });
 
@@ -51,10 +52,10 @@ const EventManagement = () => {
                }
 
                const data = await response.json();
-               console.log(data,"data")
+               console.log(data, "data")
 
                if (data.success) {
-                  
+
                     const transformedEvents = data.data.events.map(event => ({
                          id: event.id,
                          title: event.name,
@@ -101,7 +102,7 @@ const EventManagement = () => {
      // Delete event function
      const deleteEvent = async (eventId) => {
           try {
-               const response = await fetch(`https://overcontritely-epagogic-vicky.ngrok-free.dev/api/v1/event/${eventId}`, {
+               const response = await fetch(`https://server.momentumactivity.com/api/v1/event/${eventId}`, {
                     method: 'DELETE',
                     headers: {
                          'Content-Type': 'application/json',
