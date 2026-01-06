@@ -37,10 +37,10 @@ const router = createBrowserRouter([
         path: "eventManagement",
         element: <AdMinPrivate><EventManagement></EventManagement> </AdMinPrivate>
       },
-      {
-        path: "payment",
-        element: <AdMinPrivate><PaymentHistory></PaymentHistory>w</AdMinPrivate>
-      }
+      // {
+      //   path: "payment",
+      //   element: <AdMinPrivate><PaymentHistory></PaymentHistory>w</AdMinPrivate>
+      // }
      
     ]
   },
