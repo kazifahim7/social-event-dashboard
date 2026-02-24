@@ -11,6 +11,7 @@ export default function UserManagement() {
      const [currentPage, setCurrentPage] = useState(1);
      const usersPerPage = 8;
      const [totalUsers, setTotalUsers] = useState(0);
+     const [totalPages, setTotalPages] = useState(1);
      const [selectedUser, setSelectedUser] = useState(null);
      const [users, setUsers] = useState([]);
      const [searchTerm, setSearchTerm] = useState("");
@@ -30,15 +31,22 @@ export default function UserManagement() {
                const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/v1/admin/users?page=${page}&limit=${usersPerPage}`, {
                     method: "GET",
                     headers: new Headers({
-                         "ngrok-skip-browser-warning": "true",
                          Authorization: `${token}`,
                     })
                });
 
                const data = await res.json();
-               setUsers(data.data?.users || []);
-               setFilteredUsers(data.data?.users || []);
-               setTotalUsers(data.data?.users.length || 0);
+
+               if (data.success && data.data) {
+                    setUsers(data.data.users || []);
+                    setFilteredUsers(data.data.users || []);
+
+                    // Get pagination info from API response
+                    if (data.data.pagination) {
+                         setTotalUsers(data.data.pagination.total || 0);
+                         setTotalPages(data.data.pagination.totalPages || 1);
+                    }
+               }
           } catch (err) {
                console.error("Error fetching dashboard:", err.message);
                Swal.fire({
@@ -75,9 +83,6 @@ export default function UserManagement() {
           setCurrentPage(page);
           fetchDashboard(page);
      };
-
-     // Calculate total pages
-     const totalPages = Math.ceil(totalUsers / usersPerPage);
 
      // Generate page numbers
      const getPageNumbers = () => {
@@ -494,7 +499,6 @@ export default function UserManagement() {
                     )}
                </div>
 
-               {/* Modern User Details Modal */}
                {/* Modern User Details Modal */}
                {selectedUser && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">

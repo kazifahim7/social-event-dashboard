@@ -16,6 +16,7 @@ const EventManagement = () => {
      const [searchTerm, setSearchTerm] = useState('');
      const [totalPages, setTotalPages] = useState(1);
      const [totalEvents, setTotalEvents] = useState(0);
+     const [categories, setCategories] = useState(['All']);
 
      // Color scheme
      const primaryColor = '#DACBA4';
@@ -29,6 +30,7 @@ const EventManagement = () => {
      const fetchEvents = async (page = 1, search = '', category = '') => {
           try {
                setLoading(true);
+               setError(null);
 
                // Build query parameters
                const params = new URLSearchParams();
@@ -42,7 +44,6 @@ const EventManagement = () => {
                const response = await fetch(url, {
                     method: 'GET',
                     headers: new Headers({
-                         "ngrok-skip-browser-warning": "true",
                          Authorization: `${localStorage.getItem("token")}`,
                     })
                });
@@ -86,8 +87,12 @@ const EventManagement = () => {
                     }));
 
                     setEvents(transformedEvents);
-                    setTotalPages(data.data.pagination.totalPages);
-                    setTotalEvents(data.data.pagination.total);
+                    setTotalPages(parseInt(data.data.pagination.totalPages));
+                    setTotalEvents(parseInt(data.data.pagination.total));
+
+                    // Update categories from the fetched events
+                    const uniqueCategories = ['All', ...new Set(transformedEvents.map(event => event.category))];
+                    setCategories(uniqueCategories);
                } else {
                     throw new Error(data.message || 'Failed to fetch events');
                }
@@ -106,6 +111,7 @@ const EventManagement = () => {
                     method: 'DELETE',
                     headers: {
                          'Content-Type': 'application/json',
+                         Authorization: `${localStorage.getItem("token")}`,
                     }
                });
 
@@ -134,20 +140,6 @@ const EventManagement = () => {
           fetchEvents();
      }, []);
 
-     // Filter events based on category and search (client-side filtering as backup)
-     const filteredEvents = events.filter(event => {
-          const categoryMatch = filterCategory === 'All' || event.category === filterCategory;
-          const searchMatch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-               event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-               event.venue.toLowerCase().includes(searchTerm.toLowerCase());
-          return categoryMatch && searchMatch;
-     });
-
-     // Calculate current events for pagination
-     const indexOfLastEvent = currentPage * eventsPerPage;
-     const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-     const currentEvents = filteredEvents.slice(indexOfFirstEvent, indexOfLastEvent);
-
      // Handle page change
      const handlePageChange = (pageNumber) => {
           setCurrentPage(pageNumber);
@@ -167,13 +159,6 @@ const EventManagement = () => {
                if (success) {
                     setShowDeleteModal(false);
                     setEventToDelete(null);
-
-                    // Adjust current page if needed after deletion
-                    if (currentEvents.length === 1 && currentPage > 1) {
-                         const newPage = currentPage - 1;
-                         setCurrentPage(newPage);
-                         fetchEvents(newPage, searchTerm, filterCategory !== 'All' ? filterCategory : '');
-                    }
                }
           }
      };
@@ -222,9 +207,6 @@ const EventManagement = () => {
                maximumFractionDigits: 0
           }).format(amount);
      };
-
-     // Get unique categories from API data
-     const categories = ['All', ...new Set(events.map(event => event.category))];
 
      // Generate page numbers with ellipsis
      const getPageNumbers = () => {
@@ -354,10 +336,10 @@ const EventManagement = () => {
                          </div>
                     </div>
 
-                    {/* Events Grid */}
+                    {/* Events Grid - Now using events directly from API (already paginated) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                         {currentEvents.length > 0 ? (
-                              currentEvents.map((event) => (
+                         {events.length > 0 ? (
+                              events.map((event) => (
                                    <div
                                         key={event.id}
                                         className="bg-white rounded-2xl shadow-lg overflow-hidden border transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
@@ -379,7 +361,7 @@ const EventManagement = () => {
                                                   </span>
                                              </div>
 
-                                             <p className="text-sm mb-4" style={{ color: secondaryColor }}>
+                                             <p className="text-sm mb-4 line-clamp-2" style={{ color: secondaryColor }}>
                                                   {event.description}
                                              </p>
 
@@ -502,7 +484,7 @@ const EventManagement = () => {
                     {/* Current Page Info */}
                     <div className="text-center mb-8">
                          <p className="text-lg font-semibold" style={{ color: textColor }}>
-                              Showing {currentEvents.length} of {totalEvents} events • Page {currentPage} of {totalPages}
+                              Showing {events.length} of {totalEvents} events • Page {currentPage} of {totalPages}
                          </p>
                     </div>
 
