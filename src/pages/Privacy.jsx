@@ -93,7 +93,7 @@ const Privacy = () => {
                          </h2>
                          <p className="text-gray-600 leading-relaxed">
                               If you have any questions about this Privacy Policy, please contact
-                              us at: support@yourdomain.com
+                              us at: ioli1997@hotmail.com
                          </p>
                     </section>
                </div>
