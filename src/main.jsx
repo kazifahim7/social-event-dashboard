@@ -18,6 +18,7 @@ import EventManagement from './pages/EventManagement.jsx';
 import PaymentHistory from './pages/Payment.jsx';
 import AdMinPrivate from './private/AdminPrivate.jsx';
 import { Toaster } from 'react-hot-toast';
+import Privacy from './pages/Privacy.jsx';
 
 
 const router = createBrowserRouter([
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: "eventManagement",
         element: <AdMinPrivate><EventManagement></EventManagement> </AdMinPrivate>
+      },
+      {
+        path: "privacy_policy",
+        element: <Privacy></Privacy>
       },
       // {
       //   path: "payment",
