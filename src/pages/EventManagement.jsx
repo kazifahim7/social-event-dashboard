@@ -368,7 +368,7 @@ const EventManagement = () => {
                                              <div className="space-y-2 mb-4">
                                                   <div className="flex justify-between">
                                                        <span className="text-sm font-semibold" style={{ color: textColor }}>Venue:</span>
-                                                       <span className="text-sm" style={{ color: secondaryColor }}>{event.venue}</span>
+                                                       <span className="text-sm" style={{ color: secondaryColor }}>{event.venue.slice(0,30)}</span>
                                                   </div>
                                                   <div className="flex justify-between">
                                                        <span className="text-sm font-semibold" style={{ color: textColor }}>Date & Time:</span>
@@ -403,7 +403,7 @@ const EventManagement = () => {
                                                   </button>
                                                   <button
                                                        onClick={() => handleDeleteClick(event)}
-                                                       className="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 hover:shadow-lg text-white"
+                                                       className="px-4 py-2 text-sm hidden font-semibold rounded-lg transition-all duration-200 hover:shadow-lg text-white"
                                                        style={{ backgroundColor: '#EF4444' }}
                                                   >
                                                        Delete
@@ -644,7 +644,7 @@ const EventManagement = () => {
                                         </button>
                                         <button
                                              onClick={confirmDelete}
-                                             className="px-6 py-2 text-base font-semibold rounded-lg transition-all duration-200 text-white hover:shadow-lg"
+                                             className="px-6 py-2 text-base hidden font-semibold rounded-lg transition-all duration-200 text-white hover:shadow-lg"
                                              style={{ backgroundColor: '#EF4444' }}
                                         >
                                              Delete Event
